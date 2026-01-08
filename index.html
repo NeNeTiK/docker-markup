@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker</title>
+    <link rel="stylesheet" href="./css/fonts.css">
+    <link rel="stylesheet" href="./css/styles.css">
+</head>
+<body>
+    <div class="wrap">
+        <header>
+            <div class="logo" aria-hidden>
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3 12c0 0 2-6 10-6s8 6 8 6-1 6-10 6S3 12 3 12z" fill="white" opacity="0.95"></path>
+                </svg>
+            </div>
+            <div>
+                <h1 lang="en">Linux Docker - Guide</h1>
+                <p class="lead">Короткий довідник з встановлення, базових команд і найкращих практик для Docker на Linux</p>
+            </div>
+        </header>
+    <main>
+        <section class="card">
+            <div class="section-title">
+                <span class="tag">Вступ</span>
+            </div>
+            <p>Docker — система контейнеризації, що дозволяє пакувати додатки з усіма залежностями у легкі ізольовані контейнери. На
+            Linux Docker найчастіше працює нативно й використовує ядро ОС для ізоляції процесів.</p>
+        </section>
+        <section class="card">
+            <div class="section-title">
+                <span class="tag">Швидка інсталяція (Ubuntu)</span>
+            </div>
+            <p>Команди нижче показують рекомендований порядок встановлення Docker CE на Ubuntu/Debian:</p>
+<pre><code>sudo apt update
+sudo apt install -y ca-certificates curl gnupg lsb-release
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o
+/usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] \
+https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io</code></pre>
+    <p>Після інсталяції додайте свого користувача в групу docker, щоб запускати <span class="tag">docker</span> без sudo:</p>
+    <pre><code>sudo usermod -aG docker $USER
+newgrp docker</code></pre>
+        </section>
+        <section class="card">
+            <div class="section-title"><span class="tag">Базові Команди</span></div>
+            <ul>
+            <li><code>docker run --rm -it alpine sh</code> — запустити тимчасовий контейнер.</li>
+            <li><code>docker ps</code> — перегляд запущених контейнерів.</li>
+            <li><code>docker ps -a</code> — всі контейнери.</li>
+            <li><code>docker images</code> — локальні образи.</li>
+            <li><code>docker build -t myapp:1.0 .</code> — зібрати образ із Dockerfile.</li>
+            <li><code>docker rm &lt;id&gt;</code>, <code>docker rmi &lt;image&gt;</code> — видалення.</li>
+            </ul>
+        </section>
+        <section class="card">
+            <div class="section-title">
+                <span class="tag">docker-compose (швидкий приклад)</span>
+            </div>
+            <pre><code>version: '3.8'
+services:
+web:
+build: .
+ports:
+- "8080:80"
+volumes:
+- ./app:/var/www/html
+db:
+image: postgres:13
+environment:
+POSTGRES_PASSWORD: example</code></pre>
+<p><code>docker-compose up -d.</code> Зупинка: <code>docker-compose down</code>.</p>
+        </section>
+        <section class="card">
+            <div class="section-title">
+                <span class="tag">Найкращі практики</span>
+            </div>
+            <ul class="practics">
+                <li>Будьте уважні з правами користувачів — не запускайте контейнер з root-доступом без потреби.</li>
+                <li>Оптимізуйте Dockerfile: мінімізуйте шари, використовуйте <code>--no-install-recommends</code>.</li>
+                <li>Використовуйте мультистадійні збірки для зменшення розміру образів.</li>
+                <li>Логування: перенаправляйте логи у зовнішні системи (ELK, Prometheus + Grafana).</li>
+                <li>Скануйте образи на вразливості (Trivy, Clair).</li>
+            </ul>
+        </section>
+    </main>
+    <aside class="card sidebar">
+        <div class="fast-resources">
+        <h3>Швидкі ресурси</h3>
+            <div class="resource">
+                <div class="dot1"></div>
+                <div class="links">
+                <strong>Офіц. docs</strong>
+                <div class="link"><a href="http://docs.docker.com" target="_blank" rel="noopener noreferrer">docs.docker.com</a></div>
+                </div>
+            </div>
+            <div class="resource">
+                <div class="dot2"></div>
+                <div class="links">
+                <strong>Docker Hub</strong>
+                <div class="link"><a href="http://hub.docker.com" target="_blank" rel="noopener noreferrer">hub.docker.com</a></div>
+                </div>
+            </div>
+            <div class="resource">
+                <div class="dot3"></div>
+                <div class="links">
+                <strong>Trivy</strong>
+                <div class="link"><a href="http://www.aquasec.com" target="_blank" rel="noopener noreferrer">Aqua Security Trivy — scanner</a></div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <h3>Команди діагностики</h3>
+        <pre><code>sudo systemctl status docker
+docker info
+journalctl -u docker -f</code></pre>
+        <h3>Поради</h3>
+        <ul>
+            <li>Оновлення: слідкуйте за версіями Docker CE</li>
+            <li>Використовуйте overlay2 як storage driver</li>
+            <li>Чистіть непотрібні образи: docker system prune</li>
+        </ul>
+    </aside>
+    <footer>
+        <p>Linux Docker 2026 • Короткий довідник</p>
+    </footer>
+    </div>
+    
+</body>
+</html>
